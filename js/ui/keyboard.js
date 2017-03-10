@@ -253,9 +253,15 @@ const Keyboard = new Lang.Class({
         return device.get_device_type() == Clutter.InputDeviceType.TOUCHSCREEN_DEVICE;
     },
 
+    _keyboardPresent: function () {
+        let manager = Clutter.DeviceManager.get_default();
+        return manager.list_devices().some(d => d.get_device_type() == Clutter.InputDeviceType.KEYBOARD_DEVICE);
+    }
+
     _sync: function () {
         this._enableKeyboard = this._a11yApplicationsSettings.get_boolean(SHOW_KEYBOARD) ||
-                               this._lastDeviceIsTouchscreen();
+                               this._lastDeviceIsTouchscreenAndNoKeyboardPresent() &&
+                               !this._keyboardPresent();
         if (!this._enableKeyboard && !this._keyboard)
             return;
         if (this._enableKeyboard && this._keyboard &&
